@@ -1,0 +1,19 @@
+class Passenger
+{
+    static int idCounter=1;
+
+    int id;
+    String name;
+    int age;
+    char preference;
+    String allotted;
+    String status;
+
+    Passenger(String name,int age,char preference)
+    {
+        this.id=idCounter++;
+        this.name=name;
+        this.age=age;
+        this.preference=preference;
+    }
+}

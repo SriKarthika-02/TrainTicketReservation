@@ -1,0 +1,174 @@
+class TicketSystem
+{
+    Passenger[] confirmed=new Passenger[63];
+    Passenger[] rac=new Passenger[18];
+    Passenger[] waiting=new Passenger[10];
+
+    int confirmedCount=0;
+    int racCount=0;
+    int waitCount=0;
+    
+    int lowerAvailable=21;
+    int middleAvailable=21;
+    int upperAvailable=21;
+
+    void bookTicket(String name,int age,char preference)
+    {
+        Passenger p=new Passenger(name,age,preference);
+        if(confirmedCount<63)
+        {
+            allotBerth(p);
+            p.status="CONFIRMED";
+            confirmed[confirmedCount++]=p;
+            System.out.println("Ticket Booked Successfully.Passenger id:"+p.id);
+        }
+        else if(racCount<18)
+        {
+            p.status="RAC";
+            p.allotted="RAC SEAT";
+            rac[racCount++]=p;
+            System.out.println("Added to RAC.Passenger id:"+p.id);
+        }
+        else if(waitCount<10)
+        {
+            p.status="WAITING";
+            p.allotted="Waiting list";
+            waiting[waitCount++]=p;
+            System.out.println("Added to waiting list.Passenger id:"+p.id);
+        }
+        else
+        {
+            System.out.println("No tickets available");
+        }
+    }
+
+    void allotBerth(Passenger p)
+    {
+        if(p.preference=='L' && lowerAvailable>0)
+        {
+            p.allotted="lower";
+            lowerAvailable--;
+        }
+        else if(p.preference=='M' && middleAvailable>0)
+        {
+            p.allotted="middle";
+            middleAvailable--;
+        }
+        else if(p.preference=='U' && upperAvailable>0)
+        {
+            p.allotted="upper";
+            upperAvailable--;
+        }
+        else if(lowerAvailable>0)
+        {
+            p.allotted="lower";
+            lowerAvailable--;
+        }
+        else if(middleAvailable>0)
+        {
+            p.allotted="middle";
+            middleAvailable--;
+        }
+        else if(upperAvailable>0)
+        {
+            p.allotted="upper";
+            upperAvailable--;
+        }
+    }
+
+    void cancelTicket(int id)
+    {
+        for(int i=0;i<confirmedCount;i++)
+        {
+            if(confirmed[i].id==id)
+            {
+                System.out.println("Ticket Cancelled: "+confirmed[i].name);
+
+                if(confirmed[i].allotted.equals("lower")) lowerAvailable++;
+                if(confirmed[i].allotted.equals("middle")) middleAvailable++;
+                if(confirmed[i].allotted.equals("upper")) upperAvailable++;
+
+                for(int j=i;j<confirmedCount-1;j++)
+                {
+                    confirmed[j]=confirmed[j+1];
+                }
+                confirmedCount--;
+
+                moveRacToConfirmed();
+                return;
+            }
+        }
+        System.out.println("Passenger not found");
+    }
+    
+    void moveRacToConfirmed()
+    {
+        if(racCount>0)
+        {
+            Passenger p=rac[0];
+            for(int i=0;i<racCount-1;i++)
+            {
+                rac[i]=rac[i+1];
+            }
+            racCount--;
+
+            allotBerth(p);
+            p.status="CONFIRMED";
+            confirmed[confirmedCount++]=p;
+            moveWaitingToRac();
+        }
+    }
+
+    void moveWaitingToRac()
+    {
+        if(waitCount>0)
+        {
+            Passenger p=waiting[0];
+            for(int i=0;i<waitCount-1;i++)
+            {
+                waiting[i]=waiting[i+1];
+            }
+            waitCount--;
+
+            p.status="RAC";
+            p.allotted="RAC SEAT";
+            rac[racCount++]=p;
+        }
+    }
+
+    void printAvailable()
+    {
+        System.out.println("Lower Available: " + lowerAvailable);
+        System.out.println("Middle Available: " + middleAvailable);
+        System.out.println("Upper Available: " + upperAvailable);
+        System.out.println("RAC Available: " + (18 - racCount));
+        System.out.println("Waiting Available: " + (10 - waitCount));
+    }
+
+    void printBooked()
+    {
+        for(int i=0;i<confirmedCount;i++)
+        {
+            Passenger p=confirmed[i];
+            System.out.println(p.id+" "+p.name+" "+p.status+" "+p.allotted);
+        }
+    }
+
+    void printRAC()
+    {
+        for(int i=0;i<racCount;i++)
+        {
+            Passenger p=rac[i];
+            System.out.println(p.id+" "+p.name+" RAC");
+        }
+    }
+
+    void printWait()
+    {
+        for(int i=0;i<waitCount;i++)
+        {
+            Passenger p=waiting[i];
+            System.out.println(p.id+" "+p.name+" WAITING");
+        }
+    }
+}
